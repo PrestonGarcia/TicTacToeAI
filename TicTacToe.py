@@ -2,11 +2,32 @@ import tkinter as tk
 from tkinter import messagebox
 import random
 from win32api import GetSystemMetrics
+def getX():
+    global player
+    player = 'X'
+    intro.destroy()
+def getO():
+    global player
+    player = 'O'
+    intro.destroy()
+
+intro = tk.Tk()
+intro.geometry("400x125")
+introText = tk.Label(master=intro, text="X or O? X goes first, O is second")
+introText.pack()
+introText.place(x=120, y=0)
+xButton = tk.Button(master=intro, text="X",width=10, command=getX)
+xButton.pack()
+xButton.place(x=90, y=50)
+oButton = tk.Button(master=intro, text="O", width=10, command=getO)
+oButton.pack()
+oButton.place(x = 250, y=50)
+intro.mainloop()
 
 master = tk.Tk()
 master.title("Tic Tac Toe")
-master.geometry("{}x{}".format(int(GetSystemMetrics(0) / 3 - GetSystemMetrics(0) / 9), int(GetSystemMetrics(1) / 2 - GetSystemMetrics(1) / 20)))
 turn = 'X'
+master.geometry("{}x{}".format(int(GetSystemMetrics(0) / 3 - GetSystemMetrics(0) / 9), int(GetSystemMetrics(1) / 2 - GetSystemMetrics(1) / 20)))
 win = False
 turnCount = 1
 def checkForMatches(buttonOne, buttonTwo, buttonThree):
@@ -64,9 +85,12 @@ def turnChange():
             messagebox.showerror(title="Tie", message="It's a Tie!")
             master.destroy()
         else:
-            if turn == 'X':
-                turn = 'O'
-                messagebox.showinfo(title="O's turn", message="O's turn")
+            if turn == player:
+                if player == 'X':
+                    turn = 'O'
+                if player == 'O':
+                    turn = 'X'
+                messagebox.showinfo(title="{}'s turn".format(turn), message="{}'s turn".format(turn))
                 buttonPressed = False
                 while not buttonPressed:
                     buttonPressed = checkForMatches(buttonA1, buttonB1, buttonC1)
@@ -104,9 +128,9 @@ def turnChange():
 
                 buttonPressed.invoke()
 
-            elif turn == 'O':
-                turn = 'X'
-                messagebox.showinfo(title="X's turn", message="X's turn")
+            elif turn != player:
+                turn = player
+                messagebox.showinfo(title="{}'s turn".format(player), message="{}'s turn".format(player))
     else:
         pass
 def A1():
@@ -217,5 +241,41 @@ buttonC3 = tk.Button(master, text="", width= int(GetSystemMetrics(0) / 100), hei
 buttonC3.grid(row=3, column=3)
 buttonList = [buttonA1, buttonA2, buttonA3, buttonB1, buttonB2, buttonB3, buttonC1, buttonC2, buttonC3]
 cornerButtons = [buttonA1, buttonC1, buttonA3, buttonC3]
+if player == 'O' and turnCount == 1:
+    buttonPressed = False
+    while not buttonPressed:
+        buttonPressed = checkForMatches(buttonA1, buttonB1, buttonC1)
+        if buttonPressed:
+            break
+        buttonPressed = checkForMatches(buttonA2, buttonB2, buttonC2)
+        if buttonPressed:
+            break
+        buttonPressed = checkForMatches(buttonA3, buttonB3, buttonC3)
+        if buttonPressed:
+            break
+        buttonPressed = checkForMatches(buttonA1, buttonA2, buttonA3)
+        if buttonPressed:
+            break
+        buttonPressed = checkForMatches(buttonB1, buttonB2, buttonB3)
+        if buttonPressed:
+            break
+        buttonPressed = checkForMatches(buttonC1, buttonC2, buttonC3)
+        if buttonPressed:
+            break
+        buttonPressed = checkForMatches(buttonA1, buttonB2, buttonC3)
+        if buttonPressed:
+            break
+        buttonPressed = checkForMatches(buttonC1, buttonB2, buttonA3)
+        break
+
+    if not buttonPressed:
+        if buttonB2 in buttonList:
+            buttonPressed = buttonB2
+        elif len(cornerButtons) != 0:
+            buttonPressed = random.choice(cornerButtons)
+        else:
+            buttonPressed = random.choice(buttonList)
+
+    buttonPressed.invoke()
 
 tk.mainloop()
